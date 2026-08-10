@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#173b2d" />
+    <title>Battery Shelf</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <header>
+        <p class="eyebrow">GROCY BATTERIES</p>
+        <h1 id="page-title">Battery shelf</h1>
+        <p id="page-subtitle">Keep the little things powered.</p>
+      </header>
+      <p id="notice" class="notice" role="status" aria-live="polite" hidden></p>
+      <section id="battery-page" aria-labelledby="page-title">
+        <div id="battery-list" class="battery-list" aria-live="polite"></div>
+      </section>
+      <section id="manage-page" hidden aria-labelledby="page-title">
+        <form id="battery-form" class="card form-card">
+          <h2 id="form-title">Add a battery</h2>
+          <label for="battery-name">Name</label>
+          <input id="battery-name" name="name" required maxlength="100" placeholder="e.g. TV remote AA" autocomplete="off" />
+          <div class="form-actions">
+            <button type="submit">Save battery</button>
+            <button id="cancel-edit" type="button" class="button-secondary" hidden>Cancel</button>
+          </div>
+        </form>
+        <div id="manage-list" class="manage-list"></div>
+      </section>
+    </main>
+    <nav class="bottom-nav" aria-label="Main navigation">
+      <button class="nav-button active" data-page="batteries">Batteries</button>
+      <button class="nav-button" data-page="manage">Manage</button>
+    </nav>
+    <template id="empty-state"><div class="empty"><span>⌁</span><h2>No batteries yet</h2><p>Add your first battery from Manage.</p></div></template>
+    <script src="/app.js"></script>
+  </body>
+</html>

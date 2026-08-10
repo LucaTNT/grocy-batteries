@@ -1,0 +1,16 @@
+:root { color-scheme: light; --ink: #173b2d; --muted: #65746d; --cream: #f8f6ef; --paper: #fffefa; --line: #e7e4da; --yellow: #f4c95d; --danger: #a74436; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--cream); color: var(--ink); font: 16px/1.45 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+button, input { font: inherit; }
+button { cursor: pointer; border: 0; font-weight: 700; }
+.app-shell { width: min(100%, 620px); margin: 0 auto; padding: 34px 18px 104px; }
+header { padding: 0 4px 24px; } .eyebrow { color: #a77816; font-size: .72rem; font-weight: 800; letter-spacing: .13em; margin: 0 0 5px; } h1 { font-size: clamp(2rem, 8vw, 2.7rem); letter-spacing: -.055em; line-height: 1; margin: 0; } header > p:last-child { color: var(--muted); margin: 9px 0 0; }
+.battery-list, .manage-list { display: grid; gap: 12px; } .card { background: var(--paper); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 3px 0 rgba(23,59,45,.04); }
+.battery { padding: 17px; display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; } .battery h2 { font-size: 1.1rem; margin: 0; } .date { color: var(--muted); font-size: .88rem; margin: 4px 0 0; }
+.charge { background: var(--yellow); color: #442e00; border-radius: 12px; min-height: 44px; padding: 0 14px; box-shadow: inset 0 -2px rgba(68,46,0,.13); } .charge:active, button:active { transform: translateY(1px); }
+.empty { padding: 54px 22px; text-align: center; color: var(--muted); } .empty span { color: #d2a333; font-size: 3.4rem; } .empty h2 { color: var(--ink); margin: 8px 0 0; } .empty p { margin: 4px 0; }
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 12px max(18px, calc((100% - 620px) / 2 + 18px)) max(12px, env(safe-area-inset-bottom)); background: rgba(255,254,250,.94); border-top: 1px solid var(--line); backdrop-filter: blur(10px); }.nav-button { min-height: 42px; border-radius: 10px; background: transparent; color: var(--muted); }.nav-button.active { background: var(--ink); color: white; }
+.notice { border-radius: 12px; padding: 11px 13px; margin: -8px 0 16px; background: #e7f1dc; color: #365523; }.notice.error { background: #fae3df; color: #8a2b20; }
+.form-card { padding: 18px; margin-bottom: 22px; }.form-card h2 { margin: 0 0 14px; }.form-card label { display: block; font-weight: 700; margin-bottom: 6px; }.form-card input { width: 100%; padding: 12px; border: 1px solid #cdd4ca; border-radius: 10px; background: white; }.form-actions { display: flex; gap: 9px; margin-top: 14px; }.form-actions button { min-height: 42px; border-radius: 10px; padding: 0 14px; background: var(--ink); color: white; }.form-actions .button-secondary { background: #e5e9e2; color: var(--ink); }
+.manage-row { padding: 13px 15px; display: flex; align-items: center; justify-content: space-between; gap: 12px; }.manage-row strong { overflow-wrap: anywhere; }.row-actions { display: flex; gap: 7px; }.row-actions button { color: var(--ink); background: #e6ede4; border-radius: 9px; padding: 8px 10px; }.row-actions .delete { color: var(--danger); background: #fae8e5; }
+@media (min-width: 640px) { .app-shell { padding-top: 56px; } }
