@@ -20,7 +20,7 @@ function render() {
   }
 }
 function escapeHtml(value = '') { const el = document.createElement('span'); el.textContent = value; return el.innerHTML; }
-async function load() { try { state.batteries = await api('/api/objects/batteries'); state.batteries.sort((a, b) => a.name.localeCompare(b.name)); render(); } catch (error) { notice(error.message, true); } }
+async function load() { try { const details = await api('/api/batteries'); state.batteries = details.map(({ battery, last_tracked_time }) => ({ ...battery, last_tracked_time })); state.batteries.sort((a, b) => a.name.localeCompare(b.name)); render(); } catch (error) { notice(error.message, true); } }
 async function charge(id) { const button = document.querySelector(`[data-charge="${id}"]`); button.disabled = true; button.textContent = 'Saving…'; try { await api(`/api/batteries/${id}/charge`, { method: 'POST', body: JSON.stringify({ tracked_time: new Date().toISOString().slice(0, 19).replace('T', ' ') }) }); await load(); notice('Battery marked as charged.'); } catch (error) { notice(error.message, true); button.disabled = false; button.textContent = 'Charged'; } }
 function edit(id) { const battery = state.batteries.find((item) => String(item.id) === String(id)); state.editingId = id; $('#battery-name').value = battery.name; $('#battery-description').value = battery.description || ''; $('#form-title').textContent = `Edit ${battery.name}`; $('#cancel-edit').hidden = false; $('#battery-name').focus(); }
 function clearForm() { state.editingId = null; $('#battery-form').reset(); $('#form-title').textContent = 'Add a battery'; $('#cancel-edit').hidden = true; }
