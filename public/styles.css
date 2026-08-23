@@ -5,6 +5,7 @@ button, input { font: inherit; }
 button { cursor: pointer; border: 0; font-weight: 700; }
 .app-shell { width: min(100%, 620px); margin: 0 auto; padding: 34px 18px 104px; }
 header { padding: 0 4px 24px; } .eyebrow { color: #a77816; font-size: .72rem; font-weight: 800; letter-spacing: .13em; margin: 0 0 5px; } h1 { font-size: clamp(2rem, 8vw, 2.7rem); letter-spacing: -.055em; line-height: 1; margin: 0; } header > p:last-child { color: var(--muted); margin: 9px 0 0; }
+.sort-bar { display: flex; align-items: center; gap: 7px; padding: 0 2px 14px; }.sort-label { color: var(--muted); font-size: .78rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; margin-right: 2px; }.sort-button { border: 1px solid var(--line); background: var(--paper); color: var(--muted); border-radius: 999px; padding: 7px 13px; font-size: .85rem; min-height: 34px; }.sort-button.active { background: var(--ink); border-color: var(--ink); color: white; }
 .battery-list, .manage-list { display: grid; gap: 12px; } .card { background: var(--paper); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 3px 0 rgba(23,59,45,.04); }
 .battery { padding: 17px; display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: center; } .battery h2 { font-size: 1.1rem; margin: 0; } .date { color: var(--muted); font-size: .88rem; margin: 4px 0 0; }
 .charge { background: var(--yellow); color: #442e00; border-radius: 12px; min-height: 44px; padding: 0 14px; box-shadow: inset 0 -2px rgba(68,46,0,.13); } .charge:active, button:active { transform: translateY(1px); }
