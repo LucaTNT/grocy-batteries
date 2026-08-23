@@ -16,6 +16,11 @@
       </header>
       <p id="notice" class="notice" role="status" aria-live="polite" hidden></p>
       <section id="battery-page" aria-labelledby="page-title">
+        <div id="sort-bar" class="sort-bar" role="group" aria-label="Sort batteries">
+          <span class="sort-label">Sort</span>
+          <button class="sort-button" data-sort="name" aria-pressed="true">Name</button>
+          <button class="sort-button" data-sort="charged" aria-pressed="false">Last charged</button>
+        </div>
         <div id="battery-list" class="battery-list" aria-live="polite"></div>
       </section>
       <section id="manage-page" hidden aria-labelledby="page-title">
