@@ -7,7 +7,7 @@ const api = async (url, options = {}) => {
   return data;
 };
 function notice(message, error = false) { const el = $('#notice'); el.textContent = message; el.className = `notice${error ? ' error' : ''}`; el.hidden = false; setTimeout(() => { el.hidden = true; }, 4000); }
-function lastCharged(battery) { return battery.last_tracked_time || battery.charged_time || battery.last_charged || battery.row_created_timestamp; }
+function lastCharged(battery) { return battery.last_tracked_time || battery.charged_time || battery.last_charged; }
 function formatTime(value) { if (!value) return 'Never charged'; const date = new Date(value.replace(' ', 'T')); return Number.isNaN(date) ? value : `Last charged ${new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(date)}`; }
 function render() {
   const list = $('#battery-list'); const manage = $('#manage-list'); list.replaceChildren(); manage.replaceChildren();
