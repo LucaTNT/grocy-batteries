@@ -6,7 +6,13 @@ const api = async (url, options = {}) => {
   if (!response.ok) throw new Error(data?.error_message || data?.error || `Request failed (${response.status})`);
   return data;
 };
-function notice(message, error = false) { const el = $('#notice'); el.textContent = message; el.className = `notice${error ? ' error' : ''}`; el.hidden = false; setTimeout(() => { el.hidden = true; }, 4000); }
+let noticeTimer;
+// An optional action ({ label, run }) adds a button to the banner; those notices stay up longer so there is time to use it.
+function notice(message, error = false, action = null) {
+  const el = $('#notice'); el.className = `notice${error ? ' error' : ''}`; el.replaceChildren(message);
+  if (action) { const button = document.createElement('button'); button.type = 'button'; button.className = 'notice-action'; button.textContent = action.label; button.addEventListener('click', () => action.run(button)); el.append(button); }
+  el.hidden = false; clearTimeout(noticeTimer); noticeTimer = setTimeout(() => { el.hidden = true; }, action ? 10000 : 4000);
+}
 function lastCharged(battery) { return battery.last_tracked_time || battery.charged_time || battery.last_charged; }
 function formatTime(value) { if (!value) return 'Never charged'; const date = new Date(value.replace(' ', 'T')); return Number.isNaN(date) ? value : `Last charged ${new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short' }).format(date)}`; }
 function byName(a, b) { return a.name.localeCompare(b.name); }
@@ -39,14 +45,12 @@ function edit(id) { const battery = state.batteries.find((item) => String(item.i
 function clearForm() { state.editingId = null; $('#battery-form').reset(); $('#form-title').textContent = 'Add a battery'; $('#cancel-edit').hidden = true; }
 document.addEventListener('click', async (event) => { const target = event.target.closest('button'); if (!target) return; if (target.dataset.page) { const manage = target.dataset.page === 'manage'; $('#battery-page').hidden = manage; $('#manage-page').hidden = !manage; $('#page-title').textContent = manage ? 'Manage batteries' : 'Battery shelf'; $('#page-subtitle').textContent = manage ? 'Add, rename, or remove items.' : 'Keep the little things powered.'; document.querySelectorAll('.nav-button').forEach((button) => button.classList.toggle('active', button === target)); } if (target.dataset.sort) setSort(target.dataset.sort); if (target.dataset.charge) charge(target.dataset.charge); if (target.dataset.edit) edit(target.dataset.edit); if (target.dataset.delete && confirm('Delete this battery from Grocy?')) { try { await api(`/api/objects/batteries/${target.dataset.delete}`, { method: 'DELETE' }); await load(); notice('Battery deleted.'); } catch (error) { notice(error.message, true); } } });
 $('#cancel-edit').addEventListener('click', clearForm);
-$('#battery-form').addEventListener('submit', async (event) => { event.preventDefault(); const name = $('#battery-name').value.trim(); const description = $('#battery-description').value.trim(); if (!name) return; try { const id = state.editingId; const result = await api(id ? `/api/objects/batteries/${id}` : '/api/objects/batteries', { method: id ? 'PUT' : 'POST', body: JSON.stringify({ name, description }) }); clearForm(); await load(); if (id) notice('Battery updated.'); else showAdded(result?.created_object_id, name); } catch (error) { notice(error.message, true); } });
-function showAdded(id, name) {
+$('#battery-form').addEventListener('submit', async (event) => { event.preventDefault(); const name = $('#battery-name').value.trim(); const description = $('#battery-description').value.trim(); if (!name) return; try { const id = state.editingId; const result = await api(id ? `/api/objects/batteries/${id}` : '/api/objects/batteries', { method: id ? 'PUT' : 'POST', body: JSON.stringify({ name, description }) }); clearForm(); await load(); if (id) notice('Battery updated.'); else showAdded(result?.created_object_id); } catch (error) { notice(error.message, true); } });
+function showAdded(id) {
   if (!id) { notice('Battery added.'); return; }
-  state.addedId = id; $('#added-name').textContent = name; $('#added-charged').disabled = false; $('#added-charged').textContent = 'Charged now'; $('#added-dialog').showModal();
+  notice('Battery added.', false, { label: 'Charged now', run: async (button) => {
+    button.disabled = true; button.textContent = 'Saving…';
+    try { await api(`/api/batteries/${id}/charge`, { method: 'POST', body: JSON.stringify({ tracked_time: new Date().toISOString().slice(0, 19).replace('T', ' ') }) }); await load(); notice('Battery marked as charged.'); } catch (error) { notice(error.message, true); }
+  } });
 }
-$('#added-close').addEventListener('click', () => $('#added-dialog').close());
-$('#added-charged').addEventListener('click', async (event) => {
-  const button = event.currentTarget; button.disabled = true; button.textContent = 'Saving…';
-  try { await api(`/api/batteries/${state.addedId}/charge`, { method: 'POST', body: JSON.stringify({ tracked_time: new Date().toISOString().slice(0, 19).replace('T', ' ') }) }); $('#added-dialog').close(); await load(); notice('Battery marked as charged.'); } catch (error) { notice(error.message, true); button.disabled = false; button.textContent = 'Charged now'; }
-});
 load();
