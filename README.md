@@ -19,6 +19,12 @@ It has no login page: the Grocy URL and API key stay server-side in the local ap
    docker compose up --build -d
    ```
 
+   Or use the prebuilt image (amd64/arm64), published to GHCR on every push to `main`:
+
+   ```sh
+   docker run -d --env-file .env -p 3000:3000 --restart unless-stopped ghcr.io/lucatnt/grocy-batteries:latest
+   ```
+
 4. Open [http://localhost:3000](http://localhost:3000) on your phone or computer. To use it from a phone, replace `localhost` with the LAN address of the machine running Docker.
 
 ## Local development
