@@ -2,6 +2,12 @@
 
 A deliberately small, mobile-first dashboard for the battery tracker in [Grocy](https://grocy.info/). It shows your batteries, their type/description, their most recent charge/replacement time, and provides one-tap tracking. The only other screen is a compact manager for adding, renaming, describing, and deleting batteries.
 
+<p align="center">
+  <img src="docs/batteries.png" alt="Battery shelf, sorted by last charged" width="300">
+  &nbsp;&nbsp;
+  <img src="docs/manage.png" alt="Manage tab, filtered with the search bar" width="300">
+</p>
+
 It has no login page: the Grocy URL and API key stay server-side in the local app container. The browser only ever talks to this app, which proxies the required battery API calls to Grocy.
 
 ## Setup
