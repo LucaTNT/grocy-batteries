@@ -16,6 +16,7 @@
       </header>
       <p id="notice" class="notice" role="status" aria-live="polite" hidden></p>
       <section id="battery-page" aria-labelledby="page-title">
+        <input id="battery-search" class="search" type="search" placeholder="Search batteries" aria-label="Search batteries" autocomplete="off" data-list="batteries" hidden />
         <div id="sort-bar" class="sort-bar" role="group" aria-label="Sort batteries">
           <span class="sort-label">Sort</span>
           <button class="sort-button" data-sort="name" aria-pressed="true">Name</button>
@@ -35,6 +36,7 @@
             <button id="cancel-edit" type="button" class="button-secondary" hidden>Cancel</button>
           </div>
         </form>
+        <input id="manage-search" class="search" type="search" placeholder="Search batteries" aria-label="Search batteries" autocomplete="off" data-list="manage" hidden />
         <div id="manage-list" class="manage-list"></div>
       </section>
     </main>
@@ -43,6 +45,7 @@
       <button class="nav-button" data-page="manage">Manage</button>
     </nav>
     <template id="empty-state"><div class="empty"><span>⌁</span><h2>No batteries yet</h2><p>Add your first battery from Manage.</p></div></template>
+    <template id="no-matches"><div class="empty"><h2>No matches</h2><p>Nothing matches that search.</p></div></template>
     <script src="/app.js"></script>
   </body>
 </html>

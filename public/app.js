@@ -1,4 +1,4 @@
-const state = { batteries: [], editingId: null, sort: localStorage.getItem('sort') === 'charged' ? 'charged' : 'name' };
+const state = { batteries: [], editingId: null, search: { batteries: '', manage: '' }, sort: localStorage.getItem('sort') === 'charged' ? 'charged' : 'name' };
 const $ = (selector) => document.querySelector(selector);
 const api = async (url, options = {}) => {
   const response = await fetch(url, { headers: { 'Content-Type': 'application/json', ...(options.headers || {}) }, ...options });
@@ -20,20 +20,29 @@ function byName(a, b) { return a.name.localeCompare(b.name); }
 // Oldest first, with never-charged batteries ahead of them: the shelf reads as a
 // queue of what needs charging soonest.
 function byLastCharged(a, b) { const x = lastCharged(a); const y = lastCharged(b); if (!x && !y) return byName(a, b); if (!x) return -1; if (!y) return 1; return x.localeCompare(y) || byName(a, b); }
+// Case- and accent-insensitive, so "pila" finds "Píla"; every word must appear in the name or description.
+function normalize(value = '') { return value.normalize('NFD').replace(/\p{Diacritic}/gu, '').toLowerCase(); }
+function matches(battery, query) { const words = normalize(query).split(/\s+/).filter(Boolean); const haystack = normalize(`${battery.name} ${battery.description || ''}`); return words.every((word) => haystack.includes(word)); }
+function noMatches() { return $('#no-matches').content.cloneNode(true); }
 function sortedForList() { return [...state.batteries].sort(state.sort === 'charged' ? byLastCharged : byName); }
 function setSort(mode) { state.sort = mode; localStorage.setItem('sort', mode); render(); }
 function render() {
   const list = $('#battery-list'); const manage = $('#manage-list'); list.replaceChildren(); manage.replaceChildren();
   document.querySelectorAll('.sort-button').forEach((button) => { const on = button.dataset.sort === state.sort; button.classList.toggle('active', on); button.setAttribute('aria-pressed', String(on)); });
   $('#sort-bar').hidden = !state.batteries.length;
+  $('#battery-search').hidden = !state.batteries.length; $('#manage-search').hidden = !state.batteries.length;
   if (!state.batteries.length) { list.append($('#empty-state').content.cloneNode(true)); return; }
-  for (const battery of sortedForList()) {
+  const shelf = sortedForList().filter((battery) => matches(battery, state.search.batteries));
+  if (!shelf.length) list.append(noMatches());
+  for (const battery of shelf) {
     const card = document.createElement('article'); card.className = 'battery card';
     const description = battery.description?.trim();
     card.innerHTML = `<div><h2>${escapeHtml(battery.name)}</h2>${description ? `<p class="description">${escapeHtml(description)}</p>` : ''}<p class="date">${escapeHtml(formatTime(lastCharged(battery)))}</p></div><button class="charge" data-charge="${battery.id}">Charged</button>`; list.append(card);
   }
   // The manage screen is for renaming and deleting, so it stays alphabetical regardless of the shelf's sort.
-  for (const battery of [...state.batteries].sort(byName)) {
+  const rows = [...state.batteries].sort(byName).filter((battery) => matches(battery, state.search.manage));
+  if (!rows.length) manage.append(noMatches());
+  for (const battery of rows) {
     const description = battery.description?.trim();
     const row = document.createElement('div'); row.className = 'manage-row card'; row.innerHTML = `<div class="manage-row-copy"><strong>${escapeHtml(battery.name)}</strong>${description ? `<p class="description">${escapeHtml(description)}</p>` : ''}</div><div class="row-actions"><button data-edit="${battery.id}">Edit</button><button class="delete" data-delete="${battery.id}">Delete</button></div>`; manage.append(row);
   }
@@ -44,6 +53,7 @@ async function charge(id) { const button = document.querySelector(`[data-charge=
 function edit(id) { const battery = state.batteries.find((item) => String(item.id) === String(id)); state.editingId = id; $('#battery-name').value = battery.name; $('#battery-description').value = battery.description || ''; $('#form-title').textContent = `Edit ${battery.name}`; $('#cancel-edit').hidden = false; $('#battery-name').focus(); }
 function clearForm() { state.editingId = null; $('#battery-form').reset(); $('#form-title').textContent = 'Add a battery'; $('#cancel-edit').hidden = true; }
 document.addEventListener('click', async (event) => { const target = event.target.closest('button'); if (!target) return; if (target.dataset.page) { const manage = target.dataset.page === 'manage'; $('#battery-page').hidden = manage; $('#manage-page').hidden = !manage; $('#page-title').textContent = manage ? 'Manage batteries' : 'Battery shelf'; $('#page-subtitle').textContent = manage ? 'Add, rename, or remove items.' : 'Keep the little things powered.'; document.querySelectorAll('.nav-button').forEach((button) => button.classList.toggle('active', button === target)); } if (target.dataset.sort) setSort(target.dataset.sort); if (target.dataset.charge) charge(target.dataset.charge); if (target.dataset.edit) edit(target.dataset.edit); if (target.dataset.delete && confirm('Delete this battery from Grocy?')) { try { await api(`/api/objects/batteries/${target.dataset.delete}`, { method: 'DELETE' }); await load(); notice('Battery deleted.'); } catch (error) { notice(error.message, true); } } });
+document.querySelectorAll('.search').forEach((input) => input.addEventListener('input', () => { state.search[input.dataset.list] = input.value; render(); }));
 $('#cancel-edit').addEventListener('click', clearForm);
 $('#battery-form').addEventListener('submit', async (event) => { event.preventDefault(); const name = $('#battery-name').value.trim(); const description = $('#battery-description').value.trim(); if (!name) return; try { const id = state.editingId; const result = await api(id ? `/api/objects/batteries/${id}` : '/api/objects/batteries', { method: id ? 'PUT' : 'POST', body: JSON.stringify({ name, description }) }); clearForm(); await load(); if (id) notice('Battery updated.'); else showAdded(result?.created_object_id); } catch (error) { notice(error.message, true); } });
 function showAdded(id) {
